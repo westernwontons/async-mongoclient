@@ -1,0 +1,36 @@
+version: "3"
+
+networks:
+  motor-mongodb-network:
+
+
+services:
+  motor_mongodb:
+    image: mongo
+    restart: always
+    container_name: motor_mongodb
+    networks:
+      - motor-mongodb-network
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: user
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: database
+    ports:
+      - 27017:27017
+    expose:
+      - 27017
+    volumes:
+      - ./seed:/docker-entrypoint-initdb.d
+  # motor_mongodb_seed:
+  #   image: mongo
+  #   container_name: motor_mongodb_seed
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: user
+  #     MONGO_INITDB_ROOT_PASSWORD: password
+  #     MONGO_INITDB_DATABASE: database
+  #   volumes:
+  #     - ./seed-json:/seed-json
+  #   depends_on:
+  #     - motor_mongodb
+  #   networks:
+  #     - motor-mongodb-network
