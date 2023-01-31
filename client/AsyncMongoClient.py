@@ -20,6 +20,10 @@ CodecOptionsType = TypeVar("CodecOptionsType", bound=Mapping[str, Any])
 
 
 class MongoAddress(NamedTuple):
+    """
+    The address from the `MongoDB` connection string containing `host` and `port`
+    """
+
     host: str
     port: str
 
@@ -34,9 +38,7 @@ class AsyncMongoClient:
 
     # ? The `Any` here is temporary
     def __init__(self, url: str, io_loop: Any | None = None) -> None:
-        if io_loop is not None:
-            self._async_motor_client = AsyncIOMotorClient(url, io_loop=io_loop)
-        self._async_motor_client = AsyncIOMotorClient(url)
+        self._async_motor_client = AsyncIOMotorClient(url, io_loop=io_loop)
 
     @property
     def HOST(self) -> str:
