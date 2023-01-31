@@ -1,2 +1,8 @@
 # environment stuff
 .env
+
+# python
+__pycache__
+
+# vscode
+.vscode

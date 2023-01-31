@@ -9,4 +9,4 @@
 // 
 
 let collection = db.getCollection("example")
-collection.find()
+collection.aggregate({$project: {user: "$user", _id: 0}})

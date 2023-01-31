@@ -2,21 +2,19 @@
 A thin wrapper around `AsyncIOMotorClient` that provides proper types
 """
 
-import pymongo.database
-import pymongo.client_session
-import pymongo.read_preferences
-import pymongo.write_concern
-import pymongo.read_concern
-import pymongo.typings
-import pymongo.command_cursor
-import pymongo.client_options
-import pymongo.topology_description
-import bson.codec_options
+from typing import Any, NamedTuple, NoReturn, Sequence
 from motor.motor_asyncio import AsyncIOMotorClient
-from typing import Any, Mapping, NamedTuple, NoReturn, Sequence, TypeVar
+from pymongo.database import Database
+from pymongo.client_session import ClientSession, TransactionOptions
+from pymongo.read_concern import ReadConcern
+from pymongo.read_preferences import ReadPreference, _ServerMode as ServerMode
+from pymongo.write_concern import WriteConcern
+from pymongo.command_cursor import CommandCursor
+from pymongo.client_options import ClientOptions
+from pymongo.topology_description import TopologyDescription
 
-
-CodecOptionsType = TypeVar("CodecOptionsType", bound=Mapping[str, Any])
+from database import AsyncDatabase
+from typings import CodecOptions, DocumentType
 
 
 class MongoAddress(NamedTuple):
@@ -38,7 +36,10 @@ class AsyncMongoClient:
 
     # ? The `Any` here is temporary
     def __init__(self, url: str, io_loop: Any | None = None) -> None:
-        self._async_motor_client = AsyncIOMotorClient(url, io_loop=io_loop)
+        if io_loop is None:
+            self._async_motor_client = AsyncIOMotorClient(url)
+        else:
+            self._async_motor_client = AsyncIOMotorClient(url, io_loop=io_loop)
 
     @property
     def HOST(self) -> str:
@@ -109,7 +110,7 @@ class AsyncMongoClient:
         return self._async_motor_client.close
 
     @property
-    def codec_options(self) -> bson.codec_options.CodecOptions[CodecOptionsType]:
+    def codec_options(self) -> CodecOptions[DocumentType]:
         """
         Read only access to the CodecOptions of this instance.
         """
@@ -153,7 +154,7 @@ class AsyncMongoClient:
         return self._async_motor_client.nodes
 
     @property
-    def options(self) -> pymongo.client_options.ClientOptions:
+    def options(self) -> ClientOptions:
         """
         The configuration options for this client.
 
@@ -165,7 +166,7 @@ class AsyncMongoClient:
         return self._async_motor_client.options
 
     @property
-    def read_concern(self) -> pymongo.read_concern.ReadConcern:
+    def read_concern(self) -> ReadConcern:
         """
         Read only access to the `ReadConcern` of this instance.
         """
@@ -176,7 +177,7 @@ class AsyncMongoClient:
         raise AttributeError("read_concern is read-only")
 
     @property
-    def read_preference(self) -> pymongo.read_preferences.ReadPreference:
+    def read_preference(self) -> ReadPreference:
         """
         Read only access to the read preference of this instance.
         """
@@ -210,7 +211,7 @@ class AsyncMongoClient:
     @property
     def topology_description(
         self,
-    ) -> pymongo.topology_description.TopologyDescription:
+    ) -> TopologyDescription:
         """
         The description of the connected MongoDB deployment.
 
@@ -225,7 +226,7 @@ class AsyncMongoClient:
         return self._async_motor_client.topology_description
 
     @property
-    def write_concern(self) -> pymongo.write_concern.WriteConcern:
+    def write_concern(self) -> WriteConcern:
         """
         Read only access to the WriteConcern of this instance.
         """
@@ -253,9 +254,8 @@ class AsyncMongoClient:
 
     async def drop_database(
         self,
-        name_or_database: str
-        | pymongo.database.Database[pymongo.typings._DocumentType],
-        session: pymongo.client_session.ClientSession | None = None,
+        name_or_database: str | Database[DocumentType],
+        session: ClientSession | None = None,
         comment: str | None = None,
     ) -> None:
         """
@@ -281,11 +281,11 @@ class AsyncMongoClient:
     def get_database(
         self,
         name: str | None = None,
-        codec_options: bson.codec_options.CodecOptions[CodecOptionsType] | None = None,
-        read_preference: pymongo.read_preferences._ServerMode | None = None,
-        write_concern: pymongo.write_concern.WriteConcern | None = None,
-        read_concern: pymongo.read_concern.ReadConcern | None = None,
-    ) -> pymongo.database.Database[pymongo.typings._DocumentType]:
+        codec_options: CodecOptions[DocumentType] | None = None,
+        read_preference: ServerMode | None = None,
+        write_concern: WriteConcern | None = None,
+        read_concern: ReadConcern | None = None,
+    ) -> AsyncDatabase:
         """
         Get a `MotorDatabase` with the given name and options.
 
@@ -299,19 +299,22 @@ class AsyncMongoClient:
         `write_concern (optional)`: An instance of `WriteConcern`. If `None` (the default) the write_concern of this `MotorClient` is used.
         """
 
-        return self._async_motor_client.get_database(
+        if name is None:
+            name = "test"
+        database = self._async_motor_client.get_database(
             name, codec_options, read_preference, write_concern, read_concern
         )
+        return AsyncDatabase(database)
 
     def get_default_database(
         self,
         default: str | None = None,
-        codec_options: bson.codec_options.CodecOptions[CodecOptionsType] | None = None,
-        read_preference: pymongo.read_preferences._ServerMode | None = None,
-        write_concern: pymongo.write_concern.WriteConcern | None = None,
-        read_concern: pymongo.read_concern.ReadConcern | None = None,
+        codec_options: CodecOptions[DocumentType] | None = None,
+        read_preference: ServerMode | None = None,
+        write_concern: WriteConcern | None = None,
+        read_concern: ReadConcern | None = None,
         comment: Any | None = None,
-    ) -> pymongo.database.Database[pymongo.typings._DocumentType]:
+    ) -> Database[DocumentType]:
         """
         Get the database named in the MongoDB connection URI.
         Useful in scripts where you want to choose which database to use based only on the URI in a configuration file.
@@ -337,7 +340,7 @@ class AsyncMongoClient:
 
     async def list_database_names(
         self,
-        session: pymongo.client_session.ClientSession | None = None,
+        session: ClientSession | None = None,
         comment: Any | None = None,
     ) -> list[str]:
         """
@@ -353,13 +356,15 @@ class AsyncMongoClient:
 
     async def list_databases(
         self,
-        session: pymongo.client_session.ClientSession | None = None,
+        session: ClientSession | None = None,
         comment: Any | None = None,
         **kwargs: Any
-    ) -> pymongo.command_cursor.CommandCursor[dict[str, Any]]:
+    ) -> CommandCursor[dict[str, Any]]:
         """
         Get a list of the names of all databases on the connected server.
 
+        Parameters
+        ----------
         `session (optional)`: a `ClientSession`.
         `comment (optional)`: A user-provided comment to attach to this command.
         `**kwargs (optional)`: Optional parameters of the `listDatabases` command can be passed as keyword arguments to this method. The supported options differ by server version.
@@ -373,7 +378,7 @@ class AsyncMongoClient:
 
     async def server_info(
         self,
-        session: pymongo.client_session.ClientSession | None = None,
+        session: ClientSession | None = None,
     ) -> dict[str, Any]:
         """
         Get information about the MongoDB server we're connected to.
@@ -388,10 +393,9 @@ class AsyncMongoClient:
     async def start_session(
         self,
         causal_consistency: bool | None = None,
-        default_transaction_options: pymongo.client_session.TransactionOptions
-        | None = None,
+        default_transaction_options: TransactionOptions | None = None,
         snapshot: bool | None = False,
-    ) -> pymongo.client_session.ClientSession:
+    ) -> ClientSession:
         """
         Start a logical session.
 
