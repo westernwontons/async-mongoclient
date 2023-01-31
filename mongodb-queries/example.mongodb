@@ -1,0 +1,12 @@
+// 
+// 
+// 
+// 
+// 
+// 
+// 
+// 
+// 
+
+let collection = db.getCollection("example")
+collection.find()

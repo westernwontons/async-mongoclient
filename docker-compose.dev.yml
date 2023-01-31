@@ -34,3 +34,4 @@ services:
   #     - motor_mongodb
   #   networks:
   #     - motor-mongodb-network
+  #   command: sh -c "mongoimport --uri ${MONGODB_URL} --db database --collection example"
