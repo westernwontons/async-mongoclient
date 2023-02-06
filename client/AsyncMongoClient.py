@@ -1,5 +1,5 @@
 """
-A thin wrapper around `AsyncIOMotorClient` that provides proper types
+A thin wrapper around `AsyncIOMotorClient` that provides type hints
 """
 
 from typing import Any, NamedTuple, NoReturn, Sequence
@@ -13,7 +13,7 @@ from pymongo.command_cursor import CommandCursor
 from pymongo.client_options import ClientOptions
 from pymongo.topology_description import TopologyDescription
 
-from database import AsyncDatabase
+from database.AsyncDatabase import AsyncDatabase
 from typings import CodecOptions, DocumentType
 
 
@@ -420,4 +420,4 @@ class AsyncMongoClient:
     # ! Type signature in documentation doesn't have types
     # ! I'll get back to this later
     def watch(self):
-        raise NotImplementedError()
+        raise NotImplementedError

@@ -1,6 +1,4 @@
-# AsyncIOMotorMongoClient
-
-Name isn't final.
+# AsyncMongoClient
 
 ## Purpose
 
@@ -8,8 +6,14 @@ This package is supposed to be a **typed** wrapper around `Motor`, an `async Mon
 
 ## Setup
 
+### Development
+
 1. install pyenv
 2. install pyenv virtualenv
-3. run `pyenv virtualenv 3.11.1 asyncio-motor-mongo`
-4. run `pyenv local asyncio-motor-mongo`
+3. run `pyenv virtualenv 3.11.1 async-mongoclient`
+4. run `pyenv local async-mongoclient`
 5. run `pipenv install`
+
+# Install
+
+...

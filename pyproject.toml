@@ -1,2 +1,21 @@
 [tool.ruff]
 ignore = ["E501", "F405", "F401", "E999"]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "async_mongoclient_nagybotond"
+version = "0.0.1"
+authors = [
+	{ name="Nagy Botond", email="mares-zoned-0j@icloud.com"}
+]
+description = "A typed wrapper around Motor, an async MongoDB client built around PyMongo"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+	"Programming Language :: Python :: 3",
+	"License :: OSI Approved :: MIT License",
+	"Operating System :: OS Independent"
+]

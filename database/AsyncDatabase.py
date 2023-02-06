@@ -1,11 +1,12 @@
-from typing import Any
+from __future__ import annotations
+from collection import AsyncCollection
+from typing import Any, cast
 from typings import CodecOptions, DocumentType
 from pymongo.client_session import ClientSession
 from pymongo.read_concern import ReadConcern
 from pymongo.write_concern import WriteConcern
 from pymongo.database import Database
 from pymongo.read_preferences import _ServerMode as ServerMode
-from collection import AsyncCollection
 
 
 class AsyncDatabase:
@@ -77,7 +78,7 @@ class AsyncDatabase:
         session: ClientSession | None = None,
         check_exists: bool | None = True,
         **kwargs: Any,
-    ):
+    ) -> AsyncCollection:
         """Create a new :class:`~pymongo.collection.Collection` in this
         database.
 
@@ -194,13 +195,16 @@ class AsyncDatabase:
             https://mongodb.com/docs/manual/reference/command/create
         """
 
-        return self._database.create_collection(
-            name,
-            codec_options,
-            read_preference,
-            write_concern,
-            read_concern,
-            session,
-            check_exists,
-            **kwargs,
+        return cast(
+            AsyncCollection,
+            self._database.create_collection(
+                name,
+                codec_options,
+                read_preference,
+                write_concern,
+                read_concern,
+                session,
+                check_exists,
+                **kwargs,
+            ),
         )
