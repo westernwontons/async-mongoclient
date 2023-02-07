@@ -1,0 +1,31 @@
+Metadata-Version: 2.1
+Name: async-mongoclient-nagybotond
+Version: 0.0.1
+Summary: A typed wrapper around Motor, an async MongoDB client built around PyMongo
+Author-email: Nagy Botond <mares-zoned-0j@icloud.com>
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+# AsyncMongoClient
+
+## Purpose
+
+This package is supposed to be a **typed** wrapper around `Motor`, an `async MongoDB` client. That's it.
+
+## Setup
+
+### Development
+
+1. install pyenv
+2. install pyenv virtualenv
+3. run `pyenv virtualenv 3.11.1 async-mongoclient`
+4. run `pyenv local async-mongoclient`
+5. run `pipenv install`
+
+# Install
+
+...

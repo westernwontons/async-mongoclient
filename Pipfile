@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 motor = "*"
+build = "*"
 
 [dev-packages]
 devtools = "*"
